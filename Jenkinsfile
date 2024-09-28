@@ -22,23 +22,7 @@ pipeline {
                 }
             }
         }
-        stage('Cleanup Docker') {
-            steps {
-                script {
-                    echo 'Cleaning up old Docker containers'
-                    sh 'docker rm -f flask-ocr-app || true'
-                    sh 'docker container prune -f'
-                }
-            }
-        }
-        stage('Check and Free Port') {
-            steps {
-                script {
-                    echo 'Checking and freeing port 5000 if in use'
-                    sh "sudo fuser -k 5000/tcp || true"
-                }
-            }
-        }
+        
         stage('Run Docker Container') {
             steps {
                 script {
