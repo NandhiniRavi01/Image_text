@@ -27,7 +27,10 @@ pipeline {
             steps {
                 script {
                     echo 'Running Docker Container'
-                    sh 'docker run -d --name flask-ocr-app -p 5000:5000 flask-ocr-app:latest'
+                    def runStatus = sh(script: 'docker run -d --name flask-ocr-app -p 5000:5000 flask-ocr-app:latest', returnStatus: true)
+                    if (runStatus != 0) {
+                        error("Failed to run Docker container.")
+                    }
                     sleep 20
                     
                     // Wait for the container to be healthy
