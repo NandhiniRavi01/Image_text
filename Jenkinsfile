@@ -22,6 +22,18 @@ pipeline {
                 }
             }
         }
+        stage('Check Logs') {
+            steps {
+                script {
+                    echo 'Checking logs of the Docker container'
+                    // Redirect logs to a file
+                    sh 'docker logs flask-ocr-app > docker_logs.txt || true'
+                    // Archive the logs file to make it accessible in Jenkins
+                    archiveArtifacts artifacts: 'docker_logs.txt', fingerprint: true
+                }
+            }
+        }
+    }
         
         stage('Run Docker Container') {
             steps {
