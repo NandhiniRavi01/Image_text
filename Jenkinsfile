@@ -69,14 +69,7 @@ pipeline {
                 }
             }
         }
-    }
-    post {
-        always {
-            script {
-                echo 'Cleaning up...'
-                sh 'docker stop flask-ocr-app || true'
-                sh 'docker rm flask-ocr-app || true'
-            }
-        }
-    }
+    
+
+}
 }
