@@ -5,7 +5,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 git credentialsId: 'git-credential', 
-                    url: 'https://github.com/NandhiniRavi01/Image_text,
+                    url: 'https://github.com/NandhiniRavi01/Image_text.git',
                     branch: 'main'
             }
         }
