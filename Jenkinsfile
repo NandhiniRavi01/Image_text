@@ -1,70 +1,60 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_IMAGE = 'flask-ocr-app:latest'
+        CONTAINER_NAME = 'flask-ocr-app'
+        DOCKER_HUB_USER = credentials('docker-credentials')  // Replace with your Jenkins credentials ID for Docker Hub
+    }
+
     stages {
-        stage('Expose Jenkins with Ngrok') {
+        stage('Checkout Code') {
             steps {
-                script {
-                    sh 'nohup ngrok http 8080 &'
-                }
+                git url: 'https://github.com/your-repo/flask-ocr-app.git', branch: 'main'
             }
         }
-        stage('Checkout') {
-            steps {
-                git branch: 'main', url: 'https://github.com/NandhiniRavi01/Image_text.git'
-            }
-        }
-        
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    echo 'Building Docker Image'
-                    sh 'docker build -t flask-ocr-app:latest .'
+                    dockerImage = docker.build("${DOCKER_IMAGE}")
                 }
             }
         }
-        
-      
 
-        
+        stage('Clean Up Old Containers') {
+            steps {
+                script {
+                    // Stop and remove the old container if it exists
+                    sh """
+                    docker stop ${CONTAINER_NAME} || true
+                    docker rm ${CONTAINER_NAME} || true
+                    """
+                }
+            }
+        }
+
         stage('Run Docker Container') {
             steps {
                 script {
-                    echo 'Running Docker Container'
-                    sh 'docker rm -f flask-ocr-app || true' // Add this line to remove existing container
-                    sh 'docker run -d --name flask-ocr-app -p 5000:5000 flask-ocr-app:latest'
-                    sleep 20
-                    
-                    // Wait for the container to be healthy
-                    def maxRetries = 5
-                    def retries = 0
-                    while (retries < maxRetries) {
-                        if (sh(script: 'docker ps -q -f name=flask-ocr-app', returnStatus: true) == 0) {
-                            break
-                        }
-                        echo "Waiting for container to be running..."
-                        sleep 10
-                        retries++
-                    }
-                    
-                    sh 'docker exec flask-ocr-app pip show flask'
-                    sh 'docker exec flask-ocr-app ls'
+                    // Run the newly built container
+                    sh """
+                    docker run -d -p 5000:5000 --name ${CONTAINER_NAME} ${DOCKER_IMAGE}
+                    """
                 }
             }
         }
-        stage('Check Logs') {
-            steps {
-                script {
-                    echo 'Checking logs of the Docker container'
-                    // Redirect logs to a file
-                    sh 'docker logs flask-ocr-app > docker_logs.txt || true'
-                    // Archive the logs file to make it accessible in Jenkins
-                    archiveArtifacts artifacts: 'docker_logs.txt', fingerprint: true
-                }
-            }
-        }
-    
 
-}
+        stage('Post-deployment') {
+            steps {
+                echo 'Deployment complete. Flask app with OCR is running.'
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+    }
 }
