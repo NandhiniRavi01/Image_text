@@ -45,8 +45,29 @@ pipeline {
                     echo 'Running Docker Container'
                     sh 'docker run -d --name flask-ocr-app -p 5000:5000 flask-ocr-app:latest'
                     sleep 20
+                    
+                    // Wait for the container to be healthy
+                    def maxRetries = 5
+                    def retries = 0
+                    while (retries < maxRetries) {
+                        if (sh(script: 'docker ps -q -f name=flask-ocr-app', returnStatus: true) == 0) {
+                            break
+                        }
+                        echo "Waiting for container to be running..."
+                        sleep 10
+                        retries++
+                    }
+                    
                     sh 'docker exec flask-ocr-app pip show flask'
                     sh 'docker exec flask-ocr-app ls'
+                }
+            }
+        }
+        stage('Check Logs') {
+            steps {
+                script {
+                    echo 'Checking logs of the Docker container'
+                    sh 'docker logs flask-ocr-app'
                 }
             }
         }
