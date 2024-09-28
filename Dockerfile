@@ -19,7 +19,8 @@ RUN apt-get update && apt-get install -y curl && apt-get clean
 COPY . .
 
 # Create uploads directory
-RUN mkdir uploads
+RUN mkdir -p /app/upload && chmod -R 777 /app/upload
+
 
 # Expose the application port
 EXPOSE 5000
