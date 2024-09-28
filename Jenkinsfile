@@ -1,16 +1,12 @@
 pipeline {
     agent any
 
-    stages {
-        stage('Build') {
+   stages {
+        stage('Checkout') {
             steps {
-                script {
-                    // Pull the latest code from the repository
-                    git 'https://github.com/NandhiniRavi01/your-repo.git'
-                    
-                    // Build the Docker image
-                    sh 'docker build -t flask-ocr-app .'
-                }
+                git credentialsId: 'git-credential', 
+                    url: 'https://github.com/NandhiniRavi01/Image_text,
+                    branch: 'main'
             }
         }
 
