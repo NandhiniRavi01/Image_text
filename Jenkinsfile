@@ -25,7 +25,12 @@ pipeline {
             }
         }
         
-       
+       stage('Set Permissions') {
+            steps {
+                // Set permissions for the uploads directory
+                sh 'chmod -R 777 uploads'
+            }
+        }
 
         
         stage('Run Docker Container') {
