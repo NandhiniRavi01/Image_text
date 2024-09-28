@@ -14,6 +14,8 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/NandhiniRavi01/Image_text.git'
             }
         }
+        
+
         stage('Build Docker Image') {
             steps {
                 script {
@@ -33,11 +35,14 @@ pipeline {
                 }
             }
         }
+       
+
         
         stage('Run Docker Container') {
             steps {
                 script {
                     echo 'Running Docker Container'
+                    sh 'docker rm -f flask-ocr-app || true' // Add this line to remove existing container
                     sh 'docker run -d --name flask-ocr-app -p 5000:5000 flask-ocr-app:latest'
                     sleep 20
                     
