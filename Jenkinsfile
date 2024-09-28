@@ -27,10 +27,7 @@ pipeline {
             steps {
                 script {
                     echo 'Running Docker Container'
-                    def runStatus = sh(script: 'docker run -d --name flask-ocr-app -p 5000:5000 flask-ocr-app:latest', returnStatus: true)
-                    if (runStatus != 0) {
-                        error("Failed to run Docker container.")
-                    }
+                    sh 'docker run -d --name flask-ocr-app -p 5000:5000 flask-ocr-app:latest'
                     sleep 20
                     
                     // Wait for the container to be healthy
@@ -54,7 +51,10 @@ pipeline {
             steps {
                 script {
                     echo 'Checking logs of the Docker container'
-                    sh 'docker logs flask-ocr-app'
+                    // Redirect logs to a file
+                    sh 'docker logs flask-ocr-app > docker_logs.txt || true'
+                    // Archive the logs file to make it accessible in Jenkins
+                    archiveArtifacts artifacts: 'docker_logs.txt', fingerprint: true
                 }
             }
         }
