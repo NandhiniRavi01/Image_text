@@ -58,7 +58,7 @@ pipeline {
                 }
             }
         }
-        stage('Check Logs') {
+        stage('Check Logs1') {
             steps {
                 script {
                     echo 'Checking logs of the Docker container'
