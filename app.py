@@ -5,7 +5,7 @@ import pytesseract
 from PIL import Image
 
 app = Flask(__name__)
-UPLOAD_FOLDER = '/app/uploads'
+UPLOAD_FOLDER = '/app/upload'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Route to display upload form
