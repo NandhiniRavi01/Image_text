@@ -19,7 +19,9 @@ EXPOSE 5000
 # Set environment variables
 ENV FLASK_APP=app.py
 ENV FLASK_ENV=development
-ENV FLASK_DEBUG=0  # Use FLASK_DEBUG instead of FLASK_ENV as it's deprecated in Flask 2.3
+
+# Use FLASK_DEBUG instead of FLASK_ENV as it's deprecated in Flask 2.3
+ENV FLASK_DEBUG=0
 
 # Run the application
 CMD ["flask", "run", "--host=0.0.0.0", "--port=5000"]
