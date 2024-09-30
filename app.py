@@ -14,7 +14,7 @@ def upload_form():
     return '''
     <html>
     <body>
-        <h1>Upload an Image that you want to convert to text</h1>
+        <h1>Upload an Image that you want to convert the image to text</h1>
         <form method="POST" enctype="multipart/form-data" action="/upload">
             <input type="file" name="file">
             <input type="submit" value="Extract to text">
