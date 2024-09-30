@@ -14,10 +14,10 @@ def upload_form():
     return '''
     <html>
     <body>
-        <h1>Upload an Image</h1>
+        <h1>Upload an Image that you want to convert it to text</h1>
         <form method="POST" enctype="multipart/form-data" action="/upload">
             <input type="file" name="file">
-            <input type="submit" value="Upload">
+            <input type="upload the image" value="Extract to text">
         </form>
     </body>
     </html>
@@ -43,7 +43,34 @@ def upload_file():
 
         # Save the extracted text into a .txt file in the uploads folder
         text_filename = os.path.splitext(filename)[0] + '.txt'
-        text_path = os.path.join(app.config['UPLOAD_FOLDER'], text_filename)
+        text_path = os.path.join(app.con
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Clean Up Old Containers)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
++ docker stop flask-ocr-app
+flask-ocr-app
++ docker rm flask-ocr-app
+flask-ocr-app
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Run Docker Container)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
++ docker run -d -p 5006:5006 --name flask-ocr-app flask-ocr-app:latest
+cad20de286354cd4cc18eecb3fa4c7cb395bb11bbd882c798eb9f987ea466484
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Post-deployment)fig['UPLOAD_FOLDER'], text_filename)
         with open(text_path, 'w') as text_file:
             text_file.write(extracted_text)
 
