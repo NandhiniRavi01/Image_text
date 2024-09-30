@@ -1,53 +1,38 @@
-from flask import Flask, request, redirect, url_for, render_template
-import os
-from werkzeug.utils import secure_filename
+from flask import Flask, request, render_template, redirect, url_for
 import pytesseract
 from PIL import Image
+import os
 
 app = Flask(__name__)
-UPLOAD_FOLDER = '/app/upload'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Route to display upload form
+# Route for home page to upload an image
 @app.route('/')
-def upload_form():
-    return '''
-    <html>
-    <body>
-        <h1>Upload an Image</h1>
-        <form method="POST" enctype="multipart/form-data" action="/upload">
-            <input type="file" name="file">
-            <input type="submit" value="Upload">
-        </form>
-    </body>
-    </html>
-    '''
+def home():
+    return render_template('upload.html')
 
 # Route to handle image upload and text extraction
-@app.route('/upload', methods=['POST'])
-def upload_file():
+@app.route('/extract-text', methods=['POST'])
+def extract_text():
     if 'file' not in request.files:
         return 'No file part'
+
     file = request.files['file']
+
     if file.filename == '':
         return 'No selected file'
+
     if file:
-        filename = secure_filename(file.filename)
-        image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        
-        # Save the image to the uploads folder
+        # Save the image file
+        image_path = os.path.join('uploads', file.filename)
         file.save(image_path)
 
-        # Extract text from the image using pytesseract
-        extracted_text = pytesseract.image_to_string(Image.open(image_path))
+        # Perform OCR
+        img = Image.open(image_path)
+        text = pytesseract.image_to_string(img)
 
-        # Save the extracted text into a .txt file in the uploads folder
-        text_filename = os.path.splitext(filename)[0] + '.txt'
-        text_path = os.path.join(app.config['UPLOAD_FOLDER'], text_filename)
-        with open(text_path, 'w') as text_file:
-            text_file.write(extracted_text)
-
-        return f'File successfully uploaded and text extracted to {text_filename}'
+        return f"<h2>Extracted Text:</h2><p>{text}</p>"
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5006)
+    if not os.path.exists('uploads'):
+        os.makedirs('uploads')
+    app.run(debug=True)
