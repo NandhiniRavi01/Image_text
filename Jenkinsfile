@@ -4,13 +4,13 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'flask-ocr-app:latest'
         CONTAINER_NAME = 'flask-ocr-app'
-        DOCKER_HUB_USER = credentials('docker-credentials')  // Replace with your Jenkins credentials ID for Docker Hub
+        DOCKER= credentials('docker-host-root-keys')  // Replace with your Jenkins credentials ID for Docker Hub
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                git url: 'https://github.com/your-repo/flask-ocr-app.git', branch: 'main'
+                git url: 'https://github.com/NandhiniRavi01/Image_text.git', branch: 'main'
             }
         }
 
