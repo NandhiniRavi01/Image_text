@@ -1,38 +1,61 @@
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, redirect, url_for, render_template, send_from_directory
+import os
+from werkzeug.utils import secure_filename
 import pytesseract
 from PIL import Image
-import os
 
 app = Flask(__name__)
+UPLOAD_FOLDER = '/app/upload'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Route for home page to upload an image
+# Route to display upload form
 @app.route('/')
-def home():
-    return render_template('upload.html')
+def upload_form():
+    return '''
+    <html>
+    <body>
+        <h1>Upload an Image</h1>
+        <form method="POST" enctype="multipart/form-data" action="/upload">
+            <input type="file" name="file">
+            <input type="submit" value="Upload">
+        </form>
+    </body>
+    </html>
+    '''
 
 # Route to handle image upload and text extraction
-@app.route('/extract-text', methods=['POST'])
-def extract_text():
+@app.route('/upload', methods=['POST'])
+def upload_file():
     if 'file' not in request.files:
         return 'No file part'
-
     file = request.files['file']
-
     if file.filename == '':
         return 'No selected file'
-
     if file:
-        # Save the image file
-        image_path = os.path.join('uploads', file.filename)
+        filename = secure_filename(file.filename)
+        image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        
+        # Save the image to the uploads folder
         file.save(image_path)
 
-        # Perform OCR
-        img = Image.open(image_path)
-        text = pytesseract.image_to_string(img)
+        # Extract text from the image using pytesseract
+        extracted_text = pytesseract.image_to_string(Image.open(image_path))
 
-        return f"<h2>Extracted Text:</h2><p>{text}</p>"
+        # Save the extracted text into a .txt file in the uploads folder
+        text_filename = os.path.splitext(filename)[0] + '.txt'
+        text_path = os.path.join(app.config['UPLOAD_FOLDER'], text_filename)
+        with open(text_path, 'w') as text_file:
+            text_file.write(extracted_text)
+
+        # Return the contents of the text file to the user
+        return f"<h2>Extracted Text:</h2><pre>{extracted_text}</pre>"
+
+# Route to download the extracted text file
+@app.route('/download/<filename>')
+def download_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 if __name__ == '__main__':
-    if not os.path.exists('uploads'):
-        os.makedirs('uploads')
-    app.run(debug=True)
+    if not os.path.exists(UPLOAD_FOLDER):
+        os.makedirs(UPLOAD_FOLDER)
+    app.run(host='0.0.0.0', port=5006)
