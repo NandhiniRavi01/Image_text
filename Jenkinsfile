@@ -39,7 +39,7 @@ pipeline {
                 script {
                     // Run the newly built container
                     sh """
-                    docker run -d -p 5000:5000 --name ${CONTAINER_NAME} ${DOCKER_IMAGE}
+                    docker run -d -p 5006:5006 --name ${CONTAINER_NAME} ${DOCKER_IMAGE}
                     """
                 }
             }
